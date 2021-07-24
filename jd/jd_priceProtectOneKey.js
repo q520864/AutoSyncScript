@@ -53,8 +53,12 @@ $.HyperParam = {
             $.token = $.tokenList.length >= i ? $.tokenList[i] : ($.token || '')
             $.feSt = $.token ? 's' : 'f'
 
+            $.applied = false
             await onceApply()
-            // await showMsg()
+            if ($.applied) {
+                await checkOnceAppliedResult()
+            }
+            await showMsg()
             await $.wait(1000)
         }
     }
@@ -95,16 +99,6 @@ function requireConfig() {
     })
 }
 
-function getValueById(text, id) {
-    try {
-        const reg = new RegExp(`id="${id}".*value="(.*?)"`)
-        const res = text.match(reg)
-        return res[1]
-    } catch (e) {
-        throw new Error(`getValueById:${id} err`)
-    }
-}
-
 function onceApply() {
     return new Promise((resolve, reject) => {
         let paramObj = {};
@@ -115,17 +109,47 @@ function onceApply() {
         paramObj.feSt = $.feSt
 
         let options = taskurl('siteppM_skuOnceApply', paramObj)
-        // return console.log(options)
         $.post(options, (err, resp, data) => {
             try {
                 if (err) {
                     console.log(`🚫 ${arguments.callee.name.toString()} API请求失败，请检查网路\n${JSON.stringify(err)}`)
                 } else {
-                    console.log(data)
                     data = JSON.parse(data)
                     if (data.flag) {
+                        $.applied = true
                     }
                     else {
+                        console.log(JSON.stringify(data))
+                    }
+                }
+            } catch (e) {
+                reject(`⚠️ ${arguments.callee.name.toString()} API返回结果解析出错\n${e}\n${JSON.stringify(data)}`)
+            } finally {
+                resolve()
+            }
+        })
+    })
+}
+
+function checkOnceAppliedResult() {
+    return new Promise((resolve, reject) => {
+        paramObj.sid = $.HyperParam.sid_hid
+        paramObj.type = $.HyperParam.type_hid
+        paramObj.forcebot = $.forcebot
+        paramObj.num = 10
+
+        let options = taskurl('siteppM_appliedSuccAmount', paramObj)
+        $.post(options, (err, resp, data) => {
+            try {
+                if (err) {
+                    console.log(`🚫 ${arguments.callee.name.toString()} API请求失败，请检查网路\n${JSON.stringify(err)}`)
+                } else {
+                    data = JSON.parse(data)
+                    if (data.flag) {
+                        $.refundtotalamount = data.succAmount
+                    }
+                    else {
+                        console.log(JSON.stringify(data))
                     }
                 }
             } catch (e) {
@@ -200,6 +224,17 @@ function taskurl(functionid, body) {
             "Cookie": $.cookie
         },
         "body": body ? `body=${encodeURIComponent(JSON.stringify(body))}` : undefined
+    }
+}
+
+async function showMsg() {
+    const message = `X东账号${$.index} ${$.nickName || $.UserName}\n🎉 本次价格保护金额：${$.refundtotalamount}💰`
+    console.log(message)
+    if ($.refundtotalamount) {
+        $.msg($.name, ``, message, {
+            "open-url": "https://msitepp-fm.jd.com/rest/priceprophone/priceProPhoneMenu"
+        });
+        await $.notify.sendNotify($.name, message)
     }
 }
 
