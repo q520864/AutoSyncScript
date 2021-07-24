@@ -119,7 +119,7 @@ function onceApply() {
                         $.applied = true
                     }
                     else {
-                        console.log(JSON.stringify(data))
+                        console.log(`一键价格保护失败，原因：${data.responseMessage}`)
                     }
                 }
             } catch (e) {
@@ -133,6 +133,7 @@ function onceApply() {
 
 function checkOnceAppliedResult() {
     return new Promise((resolve, reject) => {
+        let paramObj = {}
         paramObj.sid = $.HyperParam.sid_hid
         paramObj.type = $.HyperParam.type_hid
         paramObj.forcebot = $.forcebot
@@ -149,7 +150,7 @@ function checkOnceAppliedResult() {
                         $.refundtotalamount = data.succAmount
                     }
                     else {
-                        console.log(JSON.stringify(data))
+                        console.log(`一键价格保护结果：${JSON.stringify(data)}`)
                     }
                 }
             } catch (e) {
