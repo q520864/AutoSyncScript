@@ -12,4 +12,4 @@ token的获取方式：
 >[rewrite_local]
 >https:\/\/api\.m.jd.com\/api\?appid=siteppM&functionId=siteppM_priceskusPull url script-request-body https://raw.githubusercontent.com/ZCY01/daily_scripts/main/jd/jd_priceProtectRewrite.js
 
-nodes 配置token：JD_TOKENS
+nodes 配置token：JD_TOKENS，token之间以 `@` 分隔，配置任意个token均可
