@@ -6,7 +6,7 @@ on:
   #push:
   #  branches: [ main ]
   repository_dispatch:
-    types: ͬ���ֿ�
+    types: Í¬²½²Ö¿â
 jobs:
   repo-sync:
     env:
@@ -22,6 +22,6 @@ jobs:
         if: env.PAT
         with:
           source_repo: "https://github.com/Aaron-lv/sync.git"
-          source_branch: "main"
+          source_branch: "jd_scripts"
           destination_branch: "Aaron-lv"
           github_token: ${{ secrets.PAT || github.event.client_payload.PAT }}
